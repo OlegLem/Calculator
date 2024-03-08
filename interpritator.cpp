@@ -4,7 +4,6 @@
 #include <iostream>
 #include <sstream>
 
-//test-222
 
 QString interprit(QString str);
 
