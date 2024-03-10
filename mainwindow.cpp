@@ -27,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->butlscob, SIGNAL(clicked()), this, SLOT(input_lscob()));
     connect(ui->butrscob, SIGNAL(clicked()), this, SLOT(input_rscob()));
     connect(ui->buttochka, SIGNAL(clicked()), this, SLOT(input_tochka()));
+    connect(ui->step, SIGNAL(clicked()), this, SLOT(input_stepen()));
+    connect(ui->kor, SIGNAL(clicked()), this, SLOT(input_koren()));
 
     connect(ui->butravno, SIGNAL(clicked()), this, SLOT(ravno()));
     connect(ui->butback, SIGNAL(clicked()), this, SLOT(back()));
@@ -50,11 +52,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->butlscob->setStyleSheet("background-color: rgb(255, 255, 0);");
     ui->butrscob->setStyleSheet("background-color: rgb(255, 255, 0);");
     ui->buttochka->setStyleSheet("background-color: rgb(255, 255, 0);");
+    ui->step->setStyleSheet("background-color: rgb(255, 255, 0);");
+    ui->kor->setStyleSheet("background-color: rgb(255, 255, 0);");
     ui->butravno->setStyleSheet("background-color: rgb(0, 255, 0);");
     ui->butback->setStyleSheet("background-color: rgb(255, 100, 100);");
     ui->butclear->setStyleSheet("background-color: rgb(255, 100, 100);");
 
-    TEReg = new QRegularExpression( "([0-9]|\\)|\\(|\\.|\\*|\\/|\\+|\\-){0,}"); // регулярное выражение 0-9 ( ) . * / + -
+    TEReg = new QRegularExpression( "([0-9]|\\)|\\(|\\.|\\*|\\/|\\+|\\-|\\v|\\^){0,}"); // регулярное выражение 0-9 ( ) . * / + -
     RegVal = new QRegularExpressionValidator(*TEReg);
     ui->lineEdit->setValidator(RegVal);
 }
@@ -204,6 +208,24 @@ void MainWindow::input_tochka()
     emit ui->lineEdit->setFocus();
 }
 
+void MainWindow::input_stepen()
+{
+    text = ui->lineEdit->text();
+    pos = ui->lineEdit->cursorPosition();
+    ui->lineEdit->setText(text.insert(pos,"^"));
+    ui->lineEdit->setCursorPosition(pos+1);
+    emit ui->lineEdit->setFocus();
+}
+
+void MainWindow::input_koren()
+{
+    text = ui->lineEdit->text();
+    pos = ui->lineEdit->cursorPosition();
+    ui->lineEdit->setText(text.insert(pos,"v"));
+    ui->lineEdit->setCursorPosition(pos+1);
+    emit ui->lineEdit->setFocus();
+}
+
 void MainWindow::ravno()
 {
     text = ui->lineEdit->text();
@@ -233,6 +255,8 @@ bool MainWindow::event(QEvent * event_p)
  //<Масштабирование элементов интерфейск относительно размера окна>
     if(QEvent::Resize == event_p->type()){
 
+        emit ui->lineEdit->setFocus();
+
         wi   =   this->geometry().width();  // длинна строки ввода
         he   =   this->geometry().height()/13; // высота строки ввода
         ui->lineEdit->resize(wi, he);
@@ -242,7 +266,7 @@ bool MainWindow::event(QEvent * event_p)
 
 
         wi   =   this->geometry().width();   // длинна текстового поля
-        he   =   this->geometry().height()/2.14;  // высота текстового поля
+        he   =   this->geometry().height()/2.85;  // высота текстового поля
         vert = ui->lineEdit->geometry().height()+ui->lineEdit->geometry().y()+1;  //сдвиг по вертикали
         horis  = 0; // сдвиг по горизонтали
         ui->textEdit->resize(wi, he);
@@ -256,104 +280,115 @@ bool MainWindow::event(QEvent * event_p)
          wi    = (wi)/5;                          //длинна кнопок
          //   horis  = 10;                        // сдвиг по горизонтали
 
-        //кнопка              1 место     1 ряд
-        ui->num7->resize      (wi,        he         );
-        ui->num7->move        (horis,     vert       );
-        fontsize(ui->num7);
 
-        //кнопка              2 место     1 ряд
-        ui->num8->resize      (wi,        he         );
-        ui->num8->move        (horis+wi,  vert      );
-        fontsize(ui->num8);
-
-        //кнопка              3 место     1 ряд
-        ui->num9->resize      (wi,        he         );
-        ui->num9->move        (horis+wi*2,vert       );
-        fontsize(ui->num9);
-
-         //кнопка             4 место     1 ряд
-        ui->butback->resize   (wi,        he         );
-        ui->butback->move     (horis+wi*3,vert       );
+         //кнопка             3 место     0 ряд
+        ui->butback->resize   (wi*4,      he         ); // двойная кнопка
+        ui->butback->move     (horis+wi,  vert       );
         fontsize(ui->butback);
 
-        //кнопка              5 место     1 ряд
+        //кнопка              0 место     0 ряд
         ui->butclear->resize  (wi,        he         );
-        ui->butclear->move    (horis+wi*4,vert       );
+        ui->butclear->move    (horis,     vert       );
         fontsize(ui->butclear);
 
-        //кнопка              1 место     2 ряд
+         //кнопка              0 место     1 ряд
+        ui->num7->resize      (wi,        he         );
+        ui->num7->move        (horis,     vert+he    );
+        fontsize(ui->num7);
+
+        //кнопка              1 место     1 ряд
+        ui->num8->resize      (wi,        he         );
+        ui->num8->move        (horis+wi,  vert+he    );
+        fontsize(ui->num8);
+
+        //кнопка              2 место     1 ряд
+        ui->num9->resize      (wi,        he         );
+        ui->num9->move        (horis+wi*2,vert+he    );
+        fontsize(ui->num9);
+
+         //кнопка             3 место     1 ряд
+        ui->step->resize      (wi,        he         );
+        ui->step->move        (horis+wi*3,vert+he    );
+        fontsize(ui->step);
+
+        //кнопка              4 место     1 ряд
+        ui->kor->resize       (wi,        he         );
+        ui->kor->move         (horis+wi*4,vert+he    );
+        fontsize(ui->kor);
+
+        //кнопка              0 место     2 ряд
         ui->num4->resize      (wi,        he         );
-        ui->num4->move        (horis,     vert+he    );
+        ui->num4->move        (horis,     vert+he*2  );
         fontsize(ui->num4);
 
-        //кнопка              2 место     2 ряд
+        //кнопка              1 место     2 ряд
         ui->num5->resize      (wi,        he         );
-        ui->num5->move        (horis+wi,  vert+he    );
+        ui->num5->move        (horis+wi,  vert+he*2  );
         fontsize(ui->num5);
 
-        //кнопка              3 место     2 ряд
+        //кнопка              2 место     2 ряд
         ui->num6->resize      (wi,        he         );
-        ui->num6->move        (horis+wi*2,vert+he    );
+        ui->num6->move        (horis+wi*2,vert+he*2  );
         fontsize(ui->num6);
 
-        //кнопка              4 место     2 ряд
+        //кнопка              3 место     2 ряд
         ui->butumnoj->resize  (wi,        he         );
-        ui->butumnoj->move    (horis+wi*3,vert+he    );
+        ui->butumnoj->move    (horis+wi*3,vert+he*2  );
         fontsize(ui->butumnoj);
 
-        //кнопка              5 место     2 ряд
+        //кнопка              4 место     2 ряд
         ui->butdelit->resize  (wi,        he         );
-        ui->butdelit->move    (horis+wi*4,vert+he    );
+        ui->butdelit->move    (horis+wi*4,vert+he*2  );
         fontsize(ui->butdelit);
 
-        //кнопка              1 место     3 ряд
+        //кнопка              0 место     3 ряд
         ui->num1->resize      (wi,        he         );
-        ui->num1->move        (horis,     vert+he*2  );
+        ui->num1->move        (horis,     vert+he*3  );
         fontsize(ui->num1);
 
-        //кнопка              2 место     3 ряд
+        //кнопка              1 место     3 ряд
         ui->num2->resize      (wi,        he         );
-        ui->num2->move        (horis+wi,  vert+he*2  );
+        ui->num2->move        (horis+wi,  vert+he*3  );
         fontsize(ui->num2);
 
-        //кнопка              3 место     3 ряд
+        //кнопка              2 место     3 ряд
         ui->num3->resize      (wi,        he         );
-        ui->num3->move        (horis+wi*2,vert+he*2  );
+        ui->num3->move        (horis+wi*2,vert+he*3  );
         fontsize(ui->num3);
 
-        //кнопка              4 место     3 ряд
+        //кнопка              3 место     3 ряд
         ui->butplus->resize   (wi,        he         );
-        ui->butplus->move     (horis+wi*3,vert+he*2  );
+        ui->butplus->move     (horis+wi*3,vert+he*3  );
         fontsize(ui->butplus);
 
-        //кнопка              5 место     3 ряд
+        //кнопка              4 место     3 ряд
         ui->butmin->resize    (wi,        he         );
-        ui->butmin->move      (horis+wi*4,vert+he*2  );
+        ui->butmin->move      (horis+wi*4,vert+he*3  );
         fontsize(ui->butmin);
 
-        //кнопка              1 место     4 ряд
+        //кнопка              0 место     4 ряд
         ui->butlscob->resize  (wi,        he         );
-        ui->butlscob->move    (horis,     vert+he*3  );
+        ui->butlscob->move    (horis,     vert+he*4  );
         fontsize(ui->butlscob);
 
-        //кнопка              2 место     4 ряд
+        //кнопка              1 место     4 ряд
         ui->num0->resize      (wi,        he         );
-        ui->num0->move        (horis+wi,  vert+he*3  );
+        ui->num0->move        (horis+wi,  vert+he*4  );
         fontsize(ui->num0);
 
-        //кнопка              3 место     4 ряд
+        //кнопка              2 место     4 ряд
         ui->butrscob->resize  (wi,        he         );
-        ui->butrscob->move    (horis+wi*2,vert+he*3  );
+        ui->butrscob->move    (horis+wi*2,vert+he*4  );
         fontsize(ui->butrscob);
 
-        //кнопка              4 место     4 ряд
+        //кнопка              3 место     4 ряд
         ui->buttochka->resize (wi,        he         );
-        ui->buttochka->move   (horis+wi*3,vert+he*3  );
+        ui->buttochka->move   (horis+wi*3,vert+he*4  );
         fontsize(ui->buttochka);
 
-        //кнопка              5 место     4 ряд
+        //кнопка              4 место     4 ряд
         ui->butravno->resize  (wi,        he         );
-        ui->butravno->move    (horis+wi*4,vert+he*3  );
+        ui->butravno->move    (horis+wi*4,vert+he*4  );
         fontsize(ui->butravno);
 
 

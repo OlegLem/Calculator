@@ -3,6 +3,9 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <QtMath>
+
+typedef qreal number; // используется числовой тип данный подлиннее с точкой от Qt
 
 
 QString interprit(QString str);
@@ -30,13 +33,15 @@ public:
     int sch;
 
 
-    qreal  n1, n2;      // используется числовой тип данный подлиннее с точкой от Qt
+    number  n1, n2;
 
 
     int Scob();
     int Arifm();
     void SimplArifm(int &size);
     void ArifmStrUpdate(bool vivod);
+    number vstep(number podstep, number step);
+    number koren(number step, number podkor);
 
     QRegularExpression *rx;
     QRegularExpression *nu;
@@ -96,13 +101,13 @@ int Interpritator::Scob() {                              // основное т�
     nu = new QRegularExpression( "[0-9]");                // регулярное выражение 0-9
     nu_and_scob_l = new QRegularExpression( "[0-9]|\\(|\\-");     // регулярное выражение 0-9 ( -
     nu_and_scob_r = new QRegularExpression( "[0-9]|\\)");     // регулярное выражение 0-9
-    zn = new QRegularExpression( "\\+|\\-|\\*|\\/|\\.");      // регулярное выражение + - * / .
-    zn_and_scob_l = new QRegularExpression( "\\+|\\-|\\*|\\/|\\(");      // регулярное выражение + - * / (
-    zn_and_scob_r = new QRegularExpression( "\\+|\\-|\\*|\\/|\\)");      // регулярное выражение + - * / )
+    zn = new QRegularExpression( "\\+|\\-|\\*|\\/|\\.|\\v|\\^");      // регулярное выражение + - * / .
+    zn_and_scob_l = new QRegularExpression( "\\+|\\-|\\*|\\/|\\v|\\^|\\(");      // регулярное выражение + - * / (
+    zn_and_scob_r = new QRegularExpression( "\\+|\\-|\\*|\\/|\\v|\\^|\\)");      // регулярное выражение + - * / )
     tchk = new QRegularExpression( "\\."); // .
     minus = new QRegularExpression( "\\-"); // -
-    zn_bez_minusa = new QRegularExpression( "\\+|\\*|\\/|\\.");      // регулярное выражение + * / .
-    zn_bez_minusa_i_tochki = new QRegularExpression( "\\+|\\*|\\/");      // регулярное выражение + * /
+    zn_bez_minusa = new QRegularExpression( "\\+|\\*|\\/|\\.|\\v|\\^");      // регулярное выражение + * / .
+    zn_bez_minusa_i_tochki = new QRegularExpression( "\\+|\\*|\\/|\\v|\\^");      // регулярное выражение + * /
 
     for(int x=0; str1[x] != '\0'; x++ ){         // перевод из const char в char
       a_str[x] = str1[x];
@@ -268,6 +273,22 @@ int Interpritator::Arifm(){                                // собственн
     n1 = 0; n2 = 0;
 
     for(int size = 1; size<strlen(b_str);  size++) {       // сначала * и /
+        switch(b_str[size]) {
+        case 'v': {
+             SimplArifm(size);   // выполняем интерпритацию из строки в готовый для вычилсления значения
+             n1 = koren(n1, n2);
+             ArifmStrUpdate(1);   // выполняем составление вывода с учётом уже решённого
+             size = 1;
+             return 1;
+             }
+        case '^': {
+            SimplArifm(size);
+            n1 = vstep(n1, n2);
+            ArifmStrUpdate(1);
+            size = 1;
+            return 1;
+            }
+         }
         switch(b_str[size]) {
         case '*': {
              SimplArifm(size);   // выполняем интерпритацию из строки в готовый для вычилсления значения
@@ -453,6 +474,30 @@ void Interpritator::ArifmStrUpdate(bool vivod){    // перобразовани
 
     if (vivod) *OutStr = *OutStr + " = \n" + c_str;  // добавляем к потенциальному выводу новую строку с упрощённым на одну операцию выражением
 }                                                    // и так пока не останется одно значение
+
+
+number Interpritator::vstep(number podstep, number step){ // podstep в степени step
+    number podkor = podstep;
+    for(; step != 1; step--){
+        podkor *= podstep;
+    }
+    return podkor;
+}
+
+number Interpritator::koren(number step, number podkor){ // step корень из podkor
+    number podstep = 0;
+    number rez = 0;
+    number mnoj = 1;
+    for(; rez != podkor && mnoj > 0.0001; ){
+        podstep+=mnoj;
+        if(rez > podkor){
+            mnoj = mnoj + 0.1;
+            podstep = 0;
+        }
+        rez = vstep(podstep, step);
+    }
+ return podstep;
+}
 
 QString interprit(QString str){
   Interpritator a(str);          // фунция создания оъекта класса

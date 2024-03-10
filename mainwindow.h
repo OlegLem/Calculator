@@ -50,6 +50,8 @@ public slots:
     void input_umnojenie();
     void input_tochka();
     void input_delenie();
+    void input_stepen();
+    void input_koren();
 
     void ravno();
     void back();
