@@ -58,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->butback->setStyleSheet("background-color: rgb(255, 100, 100);");
     ui->butclear->setStyleSheet("background-color: rgb(255, 100, 100);");
 
-    TEReg = new QRegularExpression( "([0-9]|\\)|\\(|\\.|\\*|\\/|\\+|\\-|\\v|\\^){0,}"); // регулярное выражение 0-9 ( ) . * / + -
+    TEReg = new QRegularExpression( "([0-9]|\\)|\\(|\\.|\\*|\\/|\\+|\\-|v|\\^){0,}"); // регулярное выражение 0-9 ( ) . * / + -
     RegVal = new QRegularExpressionValidator(*TEReg);
     ui->lineEdit->setValidator(RegVal);
 }
