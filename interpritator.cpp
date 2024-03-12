@@ -101,13 +101,13 @@ int Interpritator::Scob() {                              // основное т�
     nu = new QRegularExpression( "[0-9]");                // регулярное выражение 0-9
     nu_and_scob_l = new QRegularExpression( "[0-9]|\\(|\\-");     // регулярное выражение 0-9 ( -
     nu_and_scob_r = new QRegularExpression( "[0-9]|\\)");     // регулярное выражение 0-9
-    zn = new QRegularExpression( "\\+|\\-|\\*|\\/|\\.|\\v|\\^");      // регулярное выражение + - * / .
-    zn_and_scob_l = new QRegularExpression( "\\+|\\-|\\*|\\/|\\v|\\^|\\(");      // регулярное выражение + - * / (
-    zn_and_scob_r = new QRegularExpression( "\\+|\\-|\\*|\\/|\\v|\\^|\\)");      // регулярное выражение + - * / )
+    zn = new QRegularExpression( "\\+|\\-|\\*|\\/|\\.|v|\\^");      // регулярное выражение + - * / .
+    zn_and_scob_l = new QRegularExpression( "\\+|\\-|\\*|\\/|v|\\^|\\(");      // регулярное выражение + - * / (
+    zn_and_scob_r = new QRegularExpression( "\\+|\\-|\\*|\\/|v|\\^|\\)");      // регулярное выражение + - * / )
     tchk = new QRegularExpression( "\\."); // .
     minus = new QRegularExpression( "\\-"); // -
-    zn_bez_minusa = new QRegularExpression( "\\+|\\*|\\/|\\.|\\v|\\^");      // регулярное выражение + * / .
-    zn_bez_minusa_i_tochki = new QRegularExpression( "\\+|\\*|\\/|\\v|\\^");      // регулярное выражение + * /
+    zn_bez_minusa = new QRegularExpression( "\\+|\\*|\\/|\\.|v|\\^");      // регулярное выражение + * / .
+    zn_bez_minusa_i_tochki = new QRegularExpression( "\\+|\\*|\\/|v|\\^");      // регулярное выражение + * /
 
     for(int x=0; str1[x] != '\0'; x++ ){         // перевод из const char в char
       a_str[x] = str1[x];
@@ -148,7 +148,7 @@ int Interpritator::Scob() {                              // основное т�
 
     for(int x=0; a_str[x] != '\0'; x++ ){        // проверка на некорректную расстановку скобок относительно знаков, чисел и друг друга
         if(a_str[x] == '('){
-            if(x>0 && a_str[x+1]!='\0'){
+            if(x>0){
                a = a_str[x-1];
                if(!zn_and_scob_l->match(a).hasMatch()){
                    c_str[0] = a_str[x-1];
@@ -158,6 +158,8 @@ int Interpritator::Scob() {                              // основное т�
                    *OutStr = *OutStr + c_str;
                    return 0;
                }
+             }
+             if(a_str[x+1]!='\0'){
                a = a_str[x+1];
                if(!nu_and_scob_l->match(a).hasMatch()){
                    c_str[0] = a_str[x];
@@ -167,10 +169,10 @@ int Interpritator::Scob() {                              // основное т�
                    *OutStr = *OutStr + c_str;
                    return 0;
                }
-            }
+             }
         }
         if(a_str[x] == ')'){
-            if(x>0 && a_str[x+1]!='\0'){
+            if(x>0){
                a = a_str[x-1];
                if(!nu_and_scob_r->match(a).hasMatch()){
                    c_str[0] = a_str[x-1];
@@ -180,6 +182,8 @@ int Interpritator::Scob() {                              // основное т�
                    *OutStr = *OutStr + c_str;
                    return 0;
                }
+              }
+            if(a_str[x+1]!='\0'){
                a = a_str[x+1];
                if(!zn_and_scob_r->match(a).hasMatch()){
                    c_str[0] = a_str[x];
@@ -189,7 +193,7 @@ int Interpritator::Scob() {                              // основное т�
                    *OutStr = *OutStr + c_str;
                    return 0;
                }
-            }
+              }
         }
 
     }
@@ -488,13 +492,21 @@ number Interpritator::koren(number step, number podkor){ // step корень и
     number podstep = 0;
     number rez = 0;
     number mnoj = 1;
-    for(; rez != podkor && mnoj > 0.0001; ){
-        podstep+=mnoj;
+
+    while(rez != podkor && mnoj > 0.0000000001){
+
         if(rez > podkor){
-            mnoj = mnoj + 0.1;
-            podstep = 0;
+            mnoj = mnoj * 0.1;
+            while(rez > podkor){
+                podstep = podstep - mnoj;
+                rez = vstep(podstep, step);
+            }
         }
-        rez = vstep(podstep, step);
+        else {
+             podstep+=mnoj;
+             rez = vstep(podstep, step);
+             }
+
     }
  return podstep;
 }
