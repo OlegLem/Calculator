@@ -276,7 +276,16 @@ int Interpritator::Scob() {                              // основное т�
 int Interpritator::Arifm(){                                // собственно вычисление
     n1 = 0; n2 = 0;
 
-    for(int size = 1; size<strlen(b_str);  size++) {       // сначала * и /
+    for(int size = 1; size<strlen(b_str);  size++) {
+        switch(b_str[size]) {
+        case 'e': {
+
+             return 0;
+             }
+    }
+    }
+
+    for(int size = 1; size<strlen(b_str);  size++) {   //    √ и ^
         switch(b_str[size]) {
         case 'v': {
              SimplArifm(size);   // выполняем интерпритацию из строки в готовый для вычилсления значения
@@ -293,6 +302,9 @@ int Interpritator::Arifm(){                                // собственн
             return 1;
             }
          }
+    }
+
+    for(int size = 1; size<strlen(b_str);  size++) {        //  * и /
         switch(b_str[size]) {
         case '*': {
              SimplArifm(size);   // выполняем интерпритацию из строки в готовый для вычилсления значения
@@ -310,7 +322,8 @@ int Interpritator::Arifm(){                                // собственн
             }
          }
       }
-    for(int size = 1; size<strlen(b_str);  size++) {       // потом + и -
+
+    for(int size = 1; size<strlen(b_str);  size++) {       //  + и -
         switch(b_str[size]) {
         case '+': {
              SimplArifm(size);
@@ -450,7 +463,7 @@ void Interpritator::ArifmStrUpdate(bool vivod){    // перобразовани
 
 
     std::stringstream buffer;
-    buffer << n1;                       //переводим float в строку
+    buffer <<  n1;                       //переводим float в строку
 
 
     for(int x=0; buffer.str().c_str()[x] != '\0'; x++ ){
@@ -482,18 +495,34 @@ void Interpritator::ArifmStrUpdate(bool vivod){    // перобразовани
 
 number Interpritator::vstep(number podstep, number step){ // podstep в степени step
     number podkor = podstep;
-    for(; step != 1; step--){
-        podkor *= podstep;
-    }
+
+       quintptr stepINT = step, stepSCH = 0, delit = 10;
+       while(stepINT != step){
+           step *= delit;
+           stepINT = step;
+           stepSCH++;
+       }
+
+       while(step >= 2){
+           podkor *= podstep;
+           step--;
+       }
+
+       if (stepSCH != 0) {
+       delit  = vstep(delit, stepSCH);
+       podkor = koren(delit, podkor);
+       }
+
     return podkor;
 }
+
 
 number Interpritator::koren(number step, number podkor){ // step корень из podkor
     number podstep = 0;
     number rez = 0;
     number mnoj = 1;
 
-    while(rez != podkor && mnoj > 0.0000000001){
+    while(rez != podkor && mnoj > 0.000001){
 
         if(rez > podkor){
             mnoj = mnoj * 0.1;
@@ -506,10 +535,11 @@ number Interpritator::koren(number step, number podkor){ // step корень и
              podstep+=mnoj;
              rez = vstep(podstep, step);
              }
-
     }
  return podstep;
 }
+
+
 
 QString interprit(QString str){
   Interpritator a(str);          // фунция создания оъекта класса
